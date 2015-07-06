@@ -445,36 +445,27 @@ eos
 
     #second add the mapping id to current submission graphs
     rest_predicate = mapping_predicates()["REST"][0]
-    if process.name == "REST Mapping"
-      classes.each do |c|
+    classes.each do |c|
+      if c.instance_of?LinkedData::Models::Class
         sub = c.submission
         unless sub.id.to_s["latest"].nil?
           #the submission in the class might point to latest
           sub = LinkedData::Models::Ontology.find(c.submission.ontology.id)
-                  .first
-                  .latest_submission
+                    .first
+                    .latest_submission
         end
-        graph_insert = RDF::Graph.new
-        graph_insert << [c.id, RDF::URI.new(rest_predicate), backup_mapping.id]
-        Goo.sparql_update_client.insert_data(graph_insert, graph: sub.id)
+        c_id = c.id
+        graph_id = sub.id
+      else
+        # If it is an external mapping
+        c_id = c[:id]
+        graph_id = RDF::URI.new("http://data.bioontology.org/metadata/ExternalMappings")
       end
-      mapping = LinkedData::Models::Mapping.new(classes,"REST",process)
-    else
-      classes.each do |c|
-        if c.instance_of?LinkedData::Models::Class
-          c_id = c.id
-          graph_id = sub.id
-        else
-          # If it is an external mapping
-          c_id = c[:id]
-          graph_id = RDF::URI.new("http://data.bioontology.org/metadata/ExternalMappings")
-        end
-        graph_insert = RDF::Graph.new
-        graph_insert << [c_id, RDF::URI.new(rest_predicate), backup_mapping.id]
-        Goo.sparql_update_client.insert_data(graph_insert, graph: graph_id)
-      end
-      mapping = LinkedData::Models::Mapping.new(classes,"REST",process)
+      graph_insert = RDF::Graph.new
+      graph_insert << [c_id, RDF::URI.new(rest_predicate), backup_mapping.id]
+      Goo.sparql_update_client.insert_data(graph_insert, graph: graph_id)
     end
+    mapping = LinkedData::Models::Mapping.new(classes,"REST",process)
 
     return mapping
   end
