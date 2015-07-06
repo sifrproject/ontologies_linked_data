@@ -445,7 +445,7 @@ eos
 
     #second add the mapping id to current submission graphs
     rest_predicate = mapping_predicates()["REST"][0]
-    if process[:name] == "REST Mapping"
+    if process.name == "REST Mapping"
       classes.each do |c|
         sub = c.submission
         unless sub.id.to_s["latest"].nil?
