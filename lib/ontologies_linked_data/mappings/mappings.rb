@@ -458,7 +458,7 @@ eos
         graph_id = sub.id
       else
         # If it is an external mapping
-        c_id = c[:id]
+        c_id = RDF::URI.new(c[:id])
         graph_id = RDF::URI.new("http://data.bioontology.org/metadata/ExternalMappings")
       end
       graph_insert = RDF::Graph.new
