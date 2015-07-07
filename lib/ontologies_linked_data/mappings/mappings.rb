@@ -406,12 +406,22 @@ eos
     mapping = nil
     epr.query(qmappings,
               graphs: graphs).each do |sol|
-      classes = [ read_only_class(sol[:c1].to_s,sol[:s1].to_s),
-                read_only_class(sol[:c2].to_s,sol[:s2].to_s) ]
-      process = LinkedData::Models::MappingProcess.find(sol[:o]).first
-      mapping = LinkedData::Models::Mapping.new(classes,"REST",
-                                                process,
-                                                sol[:uuid])
+      if (sol[:s2].to_s == "http://data.bioontology.org/metadata/ExternalMappings")
+        classes = [ read_only_class(sol[:c1].to_s,sol[:s1].to_s),
+                    LinkedData::Models::ExternalClass.new(sol[:c2].to_s, "External") ]
+        process = LinkedData::Models::MappingProcess.find(sol[:o]).first
+        mapping = LinkedData::Models::ExternalMapping.new(classes,"REST",
+                                                  process,
+                                                  sol[:uuid])
+      else
+        classes = [ read_only_class(sol[:c1].to_s,sol[:s1].to_s),
+                    read_only_class(sol[:c2].to_s,sol[:s2].to_s) ]
+        process = LinkedData::Models::MappingProcess.find(sol[:o]).first
+        mapping = LinkedData::Models::Mapping.new(classes,"REST",
+                                                  process,
+                                                  sol[:uuid])
+      end
+
     end
     return mapping
   end
