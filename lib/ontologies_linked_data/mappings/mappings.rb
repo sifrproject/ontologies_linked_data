@@ -457,9 +457,15 @@ eos
         c_id = c.id
         graph_id = sub.id
       else
-        # If it is an external mapping
-        c_id = RDF::URI.new(c[:id])
-        graph_id = RDF::URI.new("http://data.bioontology.org/metadata/ExternalMappings")
+        if c[:source] == "ncbo"
+          # If it is a mapping from NCBO Bioportal
+          c_id = RDF::URI.new(c[:id])
+          graph_id = RDF::URI.new("http://data.bioontology.org/metadata/NcboBioportalMappings")
+        else
+          # If it is an external mapping
+          c_id = RDF::URI.new(c[:id])
+          graph_id = RDF::URI.new("http://data.bioontology.org/metadata/ExternalMappings")
+        end
       end
       graph_insert = RDF::Graph.new
       graph_insert << [c_id, RDF::URI.new(rest_predicate), backup_mapping.id]
