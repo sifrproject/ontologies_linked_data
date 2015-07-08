@@ -411,7 +411,7 @@ eos
         external_ontology = ""
         backup.class_urns.each do |class_urn|
           if !class_urn.start_with?("urn:")
-            external_ontology = u.split(":")[1]
+            external_ontology = class_urn.split(":")[1]
           end
         end
 
