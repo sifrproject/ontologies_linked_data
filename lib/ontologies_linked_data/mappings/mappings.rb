@@ -381,7 +381,7 @@ eos
   end
 
   def self.get_rest_mapping(mapping_id)
-    backup = LinkedData::Models::RestBackupMapping.find(mapping_id).first
+    backup = LinkedData::Models::RestBackupMapping.find(mapping_id).include(:class_urns).first
     if backup.nil?
       return nil
     end

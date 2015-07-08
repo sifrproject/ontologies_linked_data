@@ -13,7 +13,11 @@ module LinkedData
 
       def initialize(id, ontology)
         @id = id
-        @ontology = ontology
+        if ontology.start_with?("http")
+          @ontology = RDF::URI.new(CGI.unescape(ontology))
+        else
+          @ontology = ontology
+        end
         @type_uri = RDF::URI.new("http://www.w3.org/2002/07/owl#Class")
       end
     end
