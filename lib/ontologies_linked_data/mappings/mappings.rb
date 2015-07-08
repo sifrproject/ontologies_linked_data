@@ -406,22 +406,18 @@ eos
     mapping = nil
     epr.query(qmappings,
               graphs: graphs).each do |sol|
-      if (sol[:s2].to_s == "http://data.bioontology.org/metadata/ExternalMappings")
+      if sol[:s2].to_s == "http://data.bioontology.org/metadata/ExternalMappings" || sol[:s2].to_s == "http://data.bioontology.org/metadata/InterportalMappings"
+        # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
         classes = [ read_only_class(sol[:c1].to_s,sol[:s1].to_s),
-                    LinkedData::Models::ExternalClass.new(sol[:c2].to_s, "External") ]
-        process = LinkedData::Models::MappingProcess.find(sol[:o]).first
-        mapping = LinkedData::Models::ExternalMapping.new(classes,"REST",
-                                                  process,
-                                                  sol[:uuid])
+                    LinkedData::Models::ExternalClass.new(sol[:c2].to_s, sol[:s2].to_s) ]
       else
         classes = [ read_only_class(sol[:c1].to_s,sol[:s1].to_s),
                     read_only_class(sol[:c2].to_s,sol[:s2].to_s) ]
-        process = LinkedData::Models::MappingProcess.find(sol[:o]).first
-        mapping = LinkedData::Models::Mapping.new(classes,"REST",
-                                                  process,
-                                                  sol[:uuid])
       end
-
+      process = LinkedData::Models::MappingProcess.find(sol[:o]).first
+      mapping = LinkedData::Models::Mapping.new(classes,"REST",
+                                                process,
+                                                sol[:uuid])
     end
     return mapping
   end
@@ -469,8 +465,9 @@ eos
       else
         if c[:source] == "ncbo"
           # If it is a mapping from NCBO Bioportal
+          #TODO: if configContainingAllBioportalNamespace contains c[:source] ...
           c_id = RDF::URI.new(c[:id])
-          graph_id = RDF::URI.new("http://data.bioontology.org/metadata/NcboBioportalMappings")
+          graph_id = RDF::URI.new("http://data.bioontology.org/metadata/InterportalMappings")
         else
           # If it is an external mapping
           c_id = RDF::URI.new(c[:id])
