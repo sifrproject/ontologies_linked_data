@@ -411,12 +411,12 @@ eos
         external_ontology = ""
         backup.class_urns.each do |class_urn|
           if !class_urn.start_with?("urn:")
+            external_source = class_urn.split(":")[0]
             external_ontology = class_urn.split(":")[1]
           end
         end
-
         classes = [ read_only_class(sol[:c1].to_s,sol[:s1].to_s),
-                    LinkedData::Models::ExternalClass.new(sol[:c2].to_s, external_ontology) ]
+                    LinkedData::Models::ExternalClass.new(sol[:c2].to_s, external_ontology, external_source) ]
       else
         classes = [ read_only_class(sol[:c1].to_s,sol[:s1].to_s),
                     read_only_class(sol[:c2].to_s,sol[:s2].to_s) ]
