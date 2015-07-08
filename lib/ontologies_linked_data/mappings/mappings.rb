@@ -409,6 +409,7 @@ eos
       if sol[:s2].to_s == "http://data.bioontology.org/metadata/ExternalMappings" || sol[:s2].to_s == "http://data.bioontology.org/metadata/InterportalMappings"
         # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
         external_ontology = ""
+        external_source = ""
         backup.class_urns.each do |class_urn|
           if !class_urn.start_with?("urn:")
             external_source = class_urn.split(":")[0]
