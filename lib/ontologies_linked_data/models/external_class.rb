@@ -4,17 +4,17 @@ module LinkedData
     class ExternalClass
       include LinkedData::Hypermedia::Resource
 
-      attr_reader :id, :ontology, :type
+      attr_reader :id, :ontology, :type_uri
 
-      serialize_default :type
+      serialize_default :ontology
 
-      link_to LinkedData::Hypermedia::Link.new("self", "http://data.bioontology.org/ontologies/MESH/classes/#{CGI.escape(@id.to_s)}", RDF::URI.new("http://www.w3.org/2002/07/owl#Class")),
+      link_to LinkedData::Hypermedia::Link.new("self", lambda {|ec| "http://data.bioontology.org/ontologies/MESH/classes/#{CGI.escape(ec.id.to_s)}"}, RDF::URI.new("http://www.w3.org/2002/07/owl#Class")),
               LinkedData::Hypermedia::Link.new("ontology", "http://data.bioontology.org/ontologies/MESH", Goo.vocabulary["Ontology"])
 
-      def initialize(id, type)
+      def initialize(id, ontology)
         @id = id
-        @type = RDF::URI.new(type)
-
+        @ontology = ontology
+        @type_uri = RDF::URI.new("http://www.w3.org/2002/07/owl#Class")
       end
     end
   end

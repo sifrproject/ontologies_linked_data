@@ -15,7 +15,12 @@ module LinkedData
             hash["@id"] = prefixed_id
           end
           # Add the type
-          hash["@type"] = current_cls.type_uri.to_s if hash["@id"] && current_cls.respond_to?(:type_uri)
+          if hash["@id"] && current_cls.respond_to?(:type_uri)
+            hash["@type"] = current_cls.type_uri.to_s
+          elsif hash["@id"] && hashed_obj.respond_to?(:type_uri)
+            hash["@type"] = hashed_obj.type_uri.to_s
+          end
+
 
           # Generate links
           # NOTE: If this logic changes, also change in xml.rb
