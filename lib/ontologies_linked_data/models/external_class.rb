@@ -23,8 +23,8 @@ module LinkedData
         if source == "ext" && ontology.start_with?("http")
           @ontology = RDF::URI.new(CGI.unescape(ontology))
         else
-          #TODO: ajout d'un hash contenant le namespace de la source et l'URI pour générer cet URI en fonction du bioportal
-          @ontology = "http://data.bioontology.org/ontologies/#{ontology}"
+          # LinkedData.settings.interportal_hash
+          @ontology = "#{LinkedData.settings.interportal_hash[source]}/ontologies/#{ontology}"
         end
       end
 

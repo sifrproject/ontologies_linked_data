@@ -471,9 +471,8 @@ eos
         c_id = c.id
         graph_id = sub.id
       else
-        if c[:source] == "ncbo"
+        if LinkedData.settings.interportal_hash.has_key?(c[:source])
           # If it is a mapping from NCBO Bioportal
-          #TODO: if configContainingAllBioportalNamespace contains c[:source] ...
           c_id = RDF::URI.new(c[:id])
           graph_id = RDF::URI.new("http://data.bioontology.org/metadata/InterportalMappings")
         else
