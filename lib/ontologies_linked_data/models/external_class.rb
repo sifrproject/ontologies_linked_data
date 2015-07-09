@@ -8,7 +8,7 @@ module LinkedData
 
       serialize_never :id, :ontology, :type_uri, :source, :self_link
 
-      link_to LinkedData::Hypermedia::Link.new("self", lambda {|ec| ec.self_link.to_s}, RDF::URI.new("http://www.w3.org/2002/07/owl#Class")),
+      link_to LinkedData::Hypermedia::Link.new("self", lambda {|ec| ec.self_link.to_s}, "http://www.w3.org/2002/07/owl#Class"),
               LinkedData::Hypermedia::Link.new("ontology", lambda {|ec| ec.ontology.to_s}, Goo.vocabulary["Ontology"])
 
       def initialize(id, ontology, source)
