@@ -596,6 +596,40 @@ eos
       classes = [ read_only_class(sol[:c1].to_s,sol[:ont1].to_s),
                 read_only_class(sol[:c2].to_s,sol[:ont2].to_s) ]
       process = proc_object[sol[:o].to_s]
+
+      if sol[:ont1].to_s == "http://data.bioontology.org/metadata/ExternalMappings" || sol[:ont1].to_s == "http://data.bioontology.org/metadata/InterportalMappings"
+        # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
+        external_ontology = ""
+        external_source = ""
+        backup = LinkedData::Models::RestBackupMapping.find(sol[:uuid]).include(:class_urns).first
+        backup.class_urns.each do |class_urn|
+          if !class_urn.start_with?("urn:")
+            external_source = class_urn.split(":")[0]
+            external_ontology = class_urn.split(":")[1]
+          end
+        end
+        classes = [ read_only_class(sol[:c2].to_s,sol[:s2].to_s),
+                    LinkedData::Models::ExternalClass.new(sol[:c1].to_s, external_ontology, external_source) ]
+      elsif sol[:ont2].to_s == "http://data.bioontology.org/metadata/ExternalMappings" || sol[:ont2].to_s == "http://data.bioontology.org/metadata/InterportalMappings"
+        # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
+        external_ontology = ""
+        external_source = ""
+        backup = LinkedData::Models::RestBackupMapping.find(sol[:uuid]).include(:class_urns).first
+        backup.class_urns.each do |class_urn|
+          if !class_urn.start_with?("urn:")
+            external_source = class_urn.split(":")[0]
+            external_ontology = class_urn.split(":")[1]
+          end
+        end
+        classes = [ read_only_class(sol[:c1].to_s,sol[:s1].to_s),
+                    LinkedData::Models::ExternalClass.new(sol[:c2].to_s, external_ontology, external_source) ]
+
+      else
+        classes = [ read_only_class(sol[:c1].to_s,sol[:ont1].to_s),
+                    read_only_class(sol[:c2].to_s,sol[:ont2].to_s) ]
+      end
+
+
       mapping = LinkedData::Models::Mapping.new(classes,"REST",
                                                 process,
                                                 sol[:uuid])
