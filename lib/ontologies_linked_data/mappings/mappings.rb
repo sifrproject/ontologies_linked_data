@@ -271,8 +271,7 @@ eos
       if classId.nil?
         s1 = sol[:s1]
       end
-      classes = [ read_only_class(s1.to_s,sub1.id.to_s),
-                read_only_class(sol[:s2].to_s,graph2.to_s) ]
+
 
       backup_mapping = nil
       mapping = nil
@@ -281,6 +280,25 @@ eos
                       .find(sol[:o]).include(:process).first
         backup_mapping.process.bring_remaining
       end
+
+      if graph2.to_s == "http://data.bioontology.org/metadata/ExternalMappings" || graph2.to_s == "http://data.bioontology.org/metadata/InterportalMappings"
+        # Generate an ExternalClass if it is a mapping to a concept out of the local BioPortal
+        external_ontology = ""
+        external_source = ""
+        backup_mapping.class_urns.each do |class_urn|
+          if !class_urn.start_with?("urn:")
+            external_source = class_urn.split(":")[0]
+            external_ontology = class_urn.split(":")[1]
+          end
+        end
+        classes = [ read_only_class(s1.to_s,sub1.id.to_s),
+                    LinkedData::Models::ExternalClass.new(sol[:s2].to_s, external_ontology, external_source) ]
+      else
+        classes = [ read_only_class(s1.to_s,sub1.id.to_s),
+                    read_only_class(sol[:s2].to_s,graph2.to_s) ]
+      end
+
+
       if backup_mapping.nil?
         mapping = LinkedData::Models::Mapping.new(
                     classes,sol[:source].to_s)
