@@ -277,7 +277,7 @@ eos
       mapping = nil
       if sol[:source].to_s == "REST"
         backup_mapping = LinkedData::Models::RestBackupMapping
-                      .find(sol[:o]).include(:process).first
+                      .find(sol[:o]).include(:process, :class_urns).first
         backup_mapping.process.bring_remaining
       end
 
