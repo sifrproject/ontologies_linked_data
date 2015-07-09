@@ -4,16 +4,17 @@ module LinkedData
     class ExternalClass
       include LinkedData::Hypermedia::Resource
 
-      attr_reader :id, :ontology, :type_uri, :source
+      attr_reader :id, :ontology, :type_uri, :source, :self_link
 
-      serialize_never :id, :ontology, :type_uri, :source
+      serialize_never :id, :ontology, :type_uri, :source, :self_link
 
-      link_to LinkedData::Hypermedia::Link.new("self", lambda {|ec| "#{ec.ontology.to_s}/classes/#{CGI.escape(ec.id.to_s)}"}, RDF::URI.new("http://www.w3.org/2002/07/owl#Class")),
+      link_to LinkedData::Hypermedia::Link.new("self", lambda {|ec| ec.self_link.to_s}, RDF::URI.new("http://www.w3.org/2002/07/owl#Class")),
               LinkedData::Hypermedia::Link.new("ontology", lambda {|ec| ec.ontology.to_s}, Goo.vocabulary["Ontology"])
 
       def initialize(id, ontology, source)
         @id = id
-        @ontology = generate_ontology_uri(ontology, source)
+        generate_ontology_uri(ontology, source)
+        generate_self(id, source)
         @type_uri = RDF::URI.new("http://www.w3.org/2002/07/owl#Class")
         @source = source
       end
@@ -24,6 +25,14 @@ module LinkedData
         else
           #TODO: ajout d'un hash contenant le namespace de la source et l'URI pour générer cet URI en fonction du bioportal
           @ontology = "http://data.bioontology.org/ontologies/#{ontology}"
+        end
+      end
+
+      def generate_self(id, source)
+        if source == "ext"
+          @self_link = id
+        else
+          @self_link = "#{@ontology}/classes/#{CGI.escape(id)}"
         end
       end
     end
