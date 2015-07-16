@@ -401,19 +401,7 @@ eos
   # A method that generate classes depending on the nature of the mapping : Internal, External or Interportal
   def get_mapping_classes(c1, g1, c2, g2, backup)
 
-    if g1.start_with?("http://data.bioontology.org/metadata/InterportalMappings") || g1 == "http://data.bioontology.org/metadata/ExternalMappings"
-      # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
-      external_ontology = ""
-      external_source = ""
-      backup.class_urns.each do |class_urn|
-        if !class_urn.start_with?("urn:")
-          external_source = class_urn.split(":")[0]
-          external_ontology = class_urn.split(":")[1]
-        end
-      end
-      classes = [ read_only_class(c2,g2),
-                  LinkedData::Models::ExternalClass.new(c1, external_ontology, external_source) ]
-    elsif g2.start_with?("http://data.bioontology.org/metadata/InterportalMappings") || g2 == "http://data.bioontology.org/metadata/ExternalMappings"
+    if g2.start_with?("http://data.bioontology.org/metadata/InterportalMappings") || g2 == "http://data.bioontology.org/metadata/ExternalMappings"
       # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
       external_ontology = ""
       external_source = ""
@@ -425,6 +413,19 @@ eos
       end
       classes = [ read_only_class(c1,g1),
                   LinkedData::Models::ExternalClass.new(c2, external_ontology, external_source) ]
+
+    elsif g1.start_with?("http://data.bioontology.org/metadata/InterportalMappings") || g1 == "http://data.bioontology.org/metadata/ExternalMappings"
+      # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
+      external_ontology = ""
+      external_source = ""
+      backup.class_urns.each do |class_urn|
+        if !class_urn.start_with?("urn:")
+          external_source = class_urn.split(":")[0]
+          external_ontology = class_urn.split(":")[1]
+        end
+      end
+      classes = [ read_only_class(c2,g2),
+                  LinkedData::Models::ExternalClass.new(c1, external_ontology, external_source) ]
 
     else
       classes = [ read_only_class(c1,g1),
