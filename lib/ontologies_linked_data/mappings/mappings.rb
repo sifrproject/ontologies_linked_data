@@ -384,7 +384,7 @@ eos
 
   # A method that generate classes depending on the nature of the mapping : Internal, External or Interportal
   def self.get_mapping_classes(c1, g1, c2, g2, backup)
-    if g1.start_with?("http://data.bioontology.org/metadata/InterportalMappings") || g1.start_with?("http://data.bioontology.org/metadata/InterportalMappings")
+    if g1.start_with?("http://data.bioontology.org/metadata/InterportalMappings") || g2.start_with?("http://data.bioontology.org/metadata/InterportalMappings")
       # Generate an InterportalClass if it is a mapping to a concept out of the BioPortal
       if g1.start_with?("http://data.bioontology.org/metadata/InterportalMappings")
         c_ext = c1
