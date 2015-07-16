@@ -492,7 +492,7 @@ eos
         if LinkedData.settings.interportal_hash.has_key?(c[:source])
           # If it is a mapping from NCBO Bioportal
           c_id = RDF::URI.new(c[:id])
-          graph_id = RDF::URI.new("http://data.bioontology.org/metadata/InterportalMappings")
+          graph_id = RDF::URI.new("http://data.bioontology.org/metadata/InterportalMappings/#{c[:source]}")
         else
           # If it is an external mapping
           c_id = RDF::URI.new(c[:id])
