@@ -281,23 +281,7 @@ eos
         backup_mapping.process.bring_remaining
       end
 
-      if graph2.to_s == "http://data.bioontology.org/metadata/ExternalMappings" || graph2.to_s == "http://data.bioontology.org/metadata/InterportalMappings"
-        # Generate an ExternalClass if it is a mapping to a concept out of the local BioPortal
-        external_ontology = ""
-        external_source = ""
-        backup_mapping.class_urns.each do |class_urn|
-          if !class_urn.start_with?("urn:")
-            external_source = class_urn.split(":")[0]
-            external_ontology = class_urn.split(":")[1]
-          end
-        end
-        classes = [ read_only_class(s1.to_s,sub1.id.to_s),
-                    LinkedData::Models::ExternalClass.new(sol[:s2].to_s, external_ontology, external_source) ]
-      else
-        classes = [ read_only_class(s1.to_s,sub1.id.to_s),
-                    read_only_class(sol[:s2].to_s,graph2.to_s) ]
-      end
-
+      classes = get_mapping_classes(s1.to_s, sub1.id.to_s, sol[:s2].to_s, graph2, backup_mapping)
 
       if backup_mapping.nil?
         mapping = LinkedData::Models::Mapping.new(
@@ -400,7 +384,6 @@ eos
 
   # A method that generate classes depending on the nature of the mapping : Internal, External or Interportal
   def get_mapping_classes(c1, g1, c2, g2, backup)
-
     if g2.start_with?("http://data.bioontology.org/metadata/InterportalMappings") || g2 == "http://data.bioontology.org/metadata/ExternalMappings"
       # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
       external_ontology = ""
@@ -413,7 +396,6 @@ eos
       end
       classes = [ read_only_class(c1,g1),
                   LinkedData::Models::ExternalClass.new(c2, external_ontology, external_source) ]
-
     elsif g1.start_with?("http://data.bioontology.org/metadata/InterportalMappings") || g1 == "http://data.bioontology.org/metadata/ExternalMappings"
       # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
       external_ontology = ""
@@ -426,12 +408,10 @@ eos
       end
       classes = [ read_only_class(c2,g2),
                   LinkedData::Models::ExternalClass.new(c1, external_ontology, external_source) ]
-
     else
       classes = [ read_only_class(c1,g1),
                   read_only_class(c2,g2) ]
     end
-
     return classes
   end
 
@@ -617,37 +597,9 @@ eos
               graphs: graphs,query_options: {rules: :NONE}).each do |sol|
       process = proc_object[sol[:o].to_s]
 
-      if sol[:ont1].to_s == "http://data.bioontology.org/metadata/ExternalMappings" || sol[:ont1].to_s == "http://data.bioontology.org/metadata/InterportalMappings"
-        # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
-        external_ontology = ""
-        external_source = ""
-        backup = LinkedData::Models::RestBackupMapping.find(sol[:uuid].to_s).include(:class_urns).first
-        backup.class_urns.each do |class_urn|
-          if !class_urn.start_with?("urn:")
-            external_source = class_urn.split(":")[0]
-            external_ontology = class_urn.split(":")[1]
-          end
-        end
-        classes = [ read_only_class(sol[:c2].to_s,sol[:s2].to_s),
-                    LinkedData::Models::ExternalClass.new(sol[:c1].to_s, external_ontology, external_source) ]
-      elsif sol[:ont2].to_s == "http://data.bioontology.org/metadata/ExternalMappings" || sol[:ont2].to_s == "http://data.bioontology.org/metadata/InterportalMappings"
-        # Generate an ExternalClass if it is a mapping to a concept out of the BioPortal
-        external_ontology = ""
-        external_source = ""
-        backup = LinkedData::Models::RestBackupMapping.find(sol[:uuid].to_s).include(:class_urns).first
-        backup.class_urns.each do |class_urn|
-          if !class_urn.start_with?("urn:")
-            external_source = class_urn.split(":")[0]
-            external_ontology = class_urn.split(":")[1]
-          end
-        end
-        classes = [ read_only_class(sol[:c1].to_s,sol[:s1].to_s),
-                    LinkedData::Models::ExternalClass.new(sol[:c2].to_s, external_ontology, external_source) ]
-      else
-        classes = [ read_only_class(sol[:c1].to_s,sol[:ont1].to_s),
-                    read_only_class(sol[:c2].to_s,sol[:ont2].to_s) ]
-      end
+      backup = LinkedData::Models::RestBackupMapping.find(sol[:uuid].to_s).include(:class_urns).first
 
+      classes = get_mapping_classes(sol[:c1].to_s, sol[:ont1].to_s, sol[:c2].to_s, sol[:ont2].to_s, backup)
 
       mapping = LinkedData::Models::Mapping.new(classes,"REST",
                                                 process,
