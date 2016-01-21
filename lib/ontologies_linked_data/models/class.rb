@@ -67,8 +67,10 @@ module LinkedData
       attribute :subClassOf, namespace: :rdfs,
                  enforce: [:list, :uri]
 
+      # Ancestors retrieved by the retrieve_ancestors method
       attribute :ancestors, namespace: :rdfs, property: :subClassOf, handler: :retrieve_ancestors
 
+      # Descendants retrieved by the retrieve_descendants method
       attribute :descendants, namespace: :rdfs, property: :subClassOf,
           handler: :retrieve_descendants
 
@@ -110,6 +112,7 @@ module LinkedData
       cache_segment_keys [:class]
       cache_load submission: [ontology: [:acronym]]
 
+      # Get the property used to define hierarchical relations (rdfs:subClassOf or skos:broader)
       def self.tree_view_property(*args)
         submission = args.first
         unless submission.loaded_attributes.include?(:hasOntologyLanguage)
@@ -361,6 +364,7 @@ module LinkedData
         return root_node
       end
 
+      # Get the ancestors of the class (used by the :ancestors attribute)
       def retrieve_ancestors
         ids = retrieve_hierarchy_ids(:ancestors)
         if ids.length == 0
@@ -371,6 +375,7 @@ module LinkedData
         return LinkedData::Models::Class.in(self.submission).ids(ids).all
       end
 
+      # Get the descendants of the class (used by the :descendants attribute)
       def retrieve_descendants(page=nil,size=nil)
         ids = retrieve_hierarchy_ids(:descendants)
         if ids.length == 0
@@ -392,6 +397,7 @@ module LinkedData
         return models
       end
 
+      # Get if the class has children using the @intlHasChildren instance variable
       def hasChildren
         if instance_variable_get("@intlHasChildren").nil?
           raise ArgumentError, "HasChildren not loaded for #{self.id.to_ntriples}"
@@ -399,6 +405,8 @@ module LinkedData
         return @intlHasChildren
      end
 
+      # Get if the class has children (query the 4store to do this)
+      # TODO: query seems pretty heavy for what we want to do
      def load_has_children
         if !instance_variable_get("@intlHasChildren").nil?
           return
@@ -416,6 +424,9 @@ module LinkedData
 
       private
 
+      # Retrieves the ids of the ancestors or descendants of the class
+      # Params:
+      # +direction+:: direction of the hierarchy (:ancestors or :descendants)
       def retrieve_hierarchy_ids(direction=:ancestors)
         current_level = 1
         max_levels = 40
@@ -431,6 +442,7 @@ module LinkedData
             ids_slice = slices[i]
             threads[i] = Thread.new {
               next_level_thread = Set.new
+              # Get the query that retrieve the hierarchy (2 directions : ancestors or descendants)
               query = hierarchy_query(direction,ids_slice)
               Goo.sparql_query_client.query(query,query_options: {rules: :NONE }, graphs: graphs)
                   .each do |sol|
@@ -473,6 +485,8 @@ eos
          return query
       end
 
+      # Generate the query used by retrieve_hierarchy_ids to get the hierarchy
+      # Can go in 2 opposite directions : ancestors or descendants
       def hierarchy_query(direction,class_ids)
         filter_ids = class_ids.map { |id| "?id = <#{id}>" } .join " || "
         directional_pattern = ""

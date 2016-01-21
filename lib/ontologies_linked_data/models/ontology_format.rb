@@ -34,6 +34,8 @@ module LinkedData
         EXTENSIONS[self.acronym.downcase.to_sym]
       end
 
+      # Returns the property used to define hierarchical relations
+      # skos:broader for SKOS ontologies and rdfs:subClassOf for the rest
       def tree_property
         if obo?
           return Goo.vocabulary(:metadata)[:treeView]
@@ -44,6 +46,8 @@ module LinkedData
         return RDF::RDFS[:subClassOf]
       end
 
+      # Returns the type of classes
+      # skos:concept for SKOS ontologies and owl:Class for the rest
       def class_type
         if skos?
           return RDF::SKOS[:Concept]
