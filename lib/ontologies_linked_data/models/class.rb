@@ -50,6 +50,9 @@ module LinkedData
       attribute :notation, namespace: :skos
       attribute :prefixIRI, namespace: :metadata
 
+      # Retrieved by GOO using the "include" method with an array defining the properties we want to retrieve from the parent
+      # The property used for the hierarchy is defined by the "property" parameter of the attribute
+      # For instance: .include(parents : [:label, :notation]).first
       attribute :parents, namespace: :rdfs,
                   property: lambda {|x| self.tree_view_property(x) },
                   enforce: [:list, :class]
@@ -60,6 +63,8 @@ module LinkedData
                   enforce: [:list, :class],
                   transitive: true
 
+      # Same as parents, retrieved by GOO using the "include" method
+      # For instance: .include(children : [:label, :notation]).first
       attribute :children, namespace: :rdfs,
                   property: lambda {|x| self.tree_view_property(x) },
                   inverse: { on: :class , :attribute => :parents }
