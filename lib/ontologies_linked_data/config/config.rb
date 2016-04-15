@@ -72,6 +72,8 @@ module LinkedData
     @settings.smtp_auth_type                ||= :none # :none, :plain, :login, :cram_md5
     @settings.smtp_domain                   ||= "localhost.localhost"
     @settings.enable_starttls_auto          ||= false # set to true for use with gmail
+    # email of the instance administrator to get mail notifications when new user
+    @settings.admin_emails                  ||= ["admin@example.org"]
 
     # A dictionary to resolve namespaces when defining JSON-LD contexts
     @settings.resolve_namespace             ||= {:skos => "http://www.w3.org/2004/02/skos/core#", :owl => "http://www.w3.org/2002/07/owl#",

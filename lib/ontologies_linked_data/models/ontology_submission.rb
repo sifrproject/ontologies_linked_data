@@ -38,6 +38,7 @@ module LinkedData
                              "notes" => [],
                              "URI" => ["dcterms:identifier"]}
 
+
       model :ontology_submission, name_with: lambda { |s| submission_id_generator(s) }
       attribute :submissionId, enforce: [:integer, :existence]
 
@@ -111,7 +112,7 @@ module LinkedData
       embed :contact, :ontology
       embed_values :submissionStatus => [:code], :hasOntologyLanguage => [:acronym]
       serialize_default :contact, :ontology, :hasOntologyLanguage, :released, :creationDate, :homepage,
-                        :publication, :documentation, :version, :description, :naturalLanguage, :status, :submissionId
+                        :publication, :documentation, :version, :description, :status, :submissionId
 
       # Links
       links_load :submissionId, ontology: [:acronym]
@@ -367,18 +368,12 @@ module LinkedData
           logger.flush
         end
         delete_and_append(triples_file_path, logger, mime_type)
-        begin
-          extract_omv_metadata()
-          logger.info("OMV metadata extracted.")
-        rescue => e
-          logger.error("Error while extracting omv metadata: #{e}")
-        end
         version_info = extract_version()
         if version_info
           self.version = version_info
         end
       end
-
+      
       # Extract metadata about the ontology (omv metadata)
       # First it extracts omv metadata, then the mapped metadata
       def extract_omv_metadata
