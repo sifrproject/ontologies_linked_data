@@ -24,7 +24,7 @@ module LinkedData
                             "usedImports" => [],
                             "keyClasses" => [],
                             "keywords" => [],
-                            "knowUsage" => []}
+                            "knownUsage" => []}
 
       OMV_SINGLE_METADATA = {"documentation" => [],
                              "description" => ["dcterms:description"],
@@ -368,12 +368,13 @@ module LinkedData
           logger.flush
         end
         delete_and_append(triples_file_path, logger, mime_type)
+        extract_omv_metadata()
         version_info = extract_version()
         if version_info
           self.version = version_info
         end
       end
-      
+
       # Extract metadata about the ontology (omv metadata)
       # First it extracts omv metadata, then the mapped metadata
       def extract_omv_metadata
