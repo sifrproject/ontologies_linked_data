@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/goo.git
-  revision: f1ee855911cd21bded5a82c19e95548ec7b466a6
+  revision: 7cf92c95be0e6973bce787f7e4fd1d4141a076e7
   branch: sifr
   specs:
     goo (0.0.2)
