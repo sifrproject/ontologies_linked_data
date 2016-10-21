@@ -116,6 +116,7 @@ module LinkedData
         conf.add_search_backend(:main, service: @settings.search_server_url)
         conf.add_redis_backend(host: @settings.goo_redis_host,
                                port: @settings.goo_redis_port)
+        conf.define_main_lang(lang: @settings.main_lang)
 
         if @settings.enable_monitoring
           puts "(LD) >> Enable SPARQL monitoring with cube #{@settings.cube_host}:"+
